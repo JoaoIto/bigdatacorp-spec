@@ -26,3 +26,10 @@
 - **Resposta/Ação da IA:** Atualização do `ia-usage.md`. Criação de `src/reader.py` (generator com 3 níveis de defesa), `src/writer.py` (wrapper RFC 4180 sobre csv.writer), `src/main.py` (orquestrador com argparse, logging e contadores), `.gitignore`, e `__init__.py` para os pacotes. Execução de teste contra `sample_clubes.jsonl` para validar I/O end-to-end.
 
 ---
+
+### Interação #4
+- **Data e Hora:** 2026-08-09 20:51 (BRT)
+- **Prompt do usuário:** Refatoração da estrutura de pastas. O repositório `/spec` é somente documentação (já publicado no GitHub). Todo o código e arquivos de projeto devem ir para `/project`. Criar `/project/data` para input e output. Criar `README.md` dentro de `/project` com detalhes técnicos. Documentação geral fica em `/spec`, documentação específica do projeto fica em `/project/README.md`.
+- **Resposta/Ação da IA:** Atualização do `ia-usage.md`. Movimentação de `src/`, `tests/`, `.gitignore` da raiz para `/project`. Criação de `/project/data/input/` e `/project/data/output/`. Cópia do JSONL de amostra para `data/input/`. Criação de `/project/README.md` com detalhes técnicos. Remoção dos arquivos antigos da raiz. Teste de execução a partir da nova estrutura.
+
+---

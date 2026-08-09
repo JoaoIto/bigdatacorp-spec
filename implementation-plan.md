@@ -2,7 +2,7 @@
 
 > **Projeto:** Processamento Batch JSONL → CSV  
 > **Data:** 2026-08-09  
-> **Status:** Aguardando execução  
+> **Status:** Em execução — Fases 1 e 2 concluídas  
 > **Documentos de referência:** `research.md`, `architecture.md`, `decisions.md`
 
 ---
@@ -11,27 +11,31 @@
 
 **Objetivo:** Preparar a estrutura do projeto, configuração de qualidade de código e repositório Git.
 
-- [ ] **1.1** Criar estrutura de diretórios do projeto:
+- [x] **1.1** Criar estrutura de diretórios do projeto:
   ```
   bigdatacorp/
-  ├── src/
-  │   ├── __init__.py
-  │   ├── main.py
-  │   ├── reader.py
-  │   ├── transformer.py
-  │   └── writer.py
-  ├── tests/
-  │   ├── __init__.py
-  │   ├── test_reader.py
-  │   ├── test_transformer.py
-  │   └── test_writer.py
-  ├── spec/  (já existe)
-  ├── output/  (gerado pelo programa)
-  ├── README.md
-  └── .gitignore
+  ├── spec/                         # Repositório de documentação (GitHub)
+  │   ├── docs/                     # PDF do enunciado e JSONL original
+  │   ├── research.md
+  │   ├── architecture.md
+  │   ├── decisions.md
+  │   ├── implementation-plan.md
+  │   └── ia-usage.md
+  └── project/                      # Repositório do código (GitHub)
+      ├── src/
+      │   ├── main.py
+      │   ├── reader.py
+      │   ├── transformer.py        (Fase 3)
+      │   └── writer.py
+      ├── tests/
+      ├── data/
+      │   ├── input/                # Arquivos JSONL de entrada
+      │   └── output/               # CSVs gerados (gitignored)
+      ├── .gitignore
+      └── README.md
   ```
-- [ ] **1.2** Criar `.gitignore` com exclusões para Python (`__pycache__/`, `*.pyc`, `.venv/`, `output/`).
-- [ ] **1.3** Criar `README.md` mínimo com instruções de uso (será refinado na Fase 5).
+- [x] **1.2** Criar `.gitignore` com exclusões para Python (`__pycache__/`, `*.pyc`, `.venv/`, `data/output/`).
+- [x] **1.3** Criar `README.md` em `/project` com instruções de uso e detalhes técnicos.
 - [ ] **1.4** Inicializar repositório Git com commit inicial de infraestrutura.
 
 **Critério de conclusão:** Estrutura de pastas criada, repositório Git inicializado.
@@ -44,7 +48,7 @@
 
 ### 2A — Reader (Leitura JSONL)
 
-- [ ] **2.1** Implementar `reader.py` com o generator `read_jsonl(filepath)`:
+- [x] **2.1** Implementar `reader.py` com o generator `read_jsonl(filepath)`:
   - Assinatura: `read_jsonl(filepath: str) → Generator[Tuple[int, dict], None, None]`
   - Itera sobre o arquivo linha a linha com `for line in file`.
   - Para cada linha:
@@ -53,14 +57,14 @@
     - Se falhar (`JSONDecodeError`), loga WARNING e incrementa contador — `continue`.
     - Se o resultado não for `dict`, loga WARNING — `continue`.
     - Se sucesso, faz `yield (line_number, record)`.
-- [ ] **2.2** Garantir que o `open()` usa `encoding='utf-8'`.
+- [x] **2.2** Garantir que o `open()` usa `encoding='utf-8'`.
 
 ### 2B — Writer (Escrita CSV)
 
-- [ ] **2.3** Implementar `writer.py` com funções de criação dos writers:
+- [x] **2.3** Implementar `writer.py` com funções de criação dos writers:
   - `create_csv_writer(filepath, header)` → abre arquivo com `newline=''` e `encoding='utf-8'`, cria `csv.writer`, escreve o header, retorna `(file_handle, csv_writer)`.
-- [ ] **2.4** Garantir que o `open()` usa `newline=''` (obrigatório para o módulo `csv` no Windows — evita `\r\r\n`).
-- [ ] **2.5** Definir as constantes de cabeçalho em `transformer.py`:
+- [x] **2.4** Garantir que o `open()` usa `newline=''` (obrigatório para o módulo `csv` no Windows — evita `\r\r\n`).
+- [x] **2.5** Definir as constantes de cabeçalho em `writer.py` (movidas para writer por coesão nesta fase):
   - `CLUBS_HEADER`: Lista com os 11 nomes de coluna em português, na ordem exata.
   - `PLAYERS_HEADER`: Lista com os 8 nomes de coluna em português, na ordem exata.
 
