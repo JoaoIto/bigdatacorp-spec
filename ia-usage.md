@@ -33,3 +33,10 @@
 - **Resposta/Ação da IA:** Atualização do `ia-usage.md`. Movimentação de `src/`, `tests/`, `.gitignore` da raiz para `/project`. Criação de `/project/data/input/` e `/project/data/output/`. Cópia do JSONL de amostra para `data/input/`. Criação de `/project/README.md` com detalhes técnicos. Remoção dos arquivos antigos da raiz. Teste de execução a partir da nova estrutura.
 
 ---
+
+### Interação #5
+- **Data e Hora:** 2026-08-09 20:59 (BRT)
+- **Prompt do usuário:** Missão 4 — Implementação do Transformer e regras de negócio (Fase 3 do plano). Criar `transformer.py` com: `is_valid_championship()` (filtro Série A/B case-insensitive), `safe_str()` (extração segura com fallback), `format_date()` (validação e formatação yyyy-MM-dd), `format_colors()` (join com pipe `|`), `transform_club()` (11 campos) e `transform_player()` (8 campos). Integrar ao `main.py` substituindo a extração bruta. Testar contra `sample_clubes.jsonl` esperando: NAC filtrado, cores com pipe, datas formatadas, nickname null vazio.
+- **Resposta/Ação da IA:** Atualização do `ia-usage.md`. Criação de `src/transformer.py` com 6 funções de regras de negócio e 2 constantes de header (movidas do writer). Refatoração de `main.py` para usar o transformer no pipeline. Remoção de funções brutas de extração. Teste end-to-end validando os CSVs finais com regras aplicadas.
+
+---

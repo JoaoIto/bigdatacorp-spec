@@ -78,7 +78,7 @@
 
 ### 3A — Filtro de Campeonato (RN01)
 
-- [ ] **3.1** Implementar `is_valid_championship(record) → bool` em `transformer.py`:
+- [x] **3.1** Implementar `is_valid_championship(record) → bool` em `transformer.py`:
   - Extrai `record.get('championship')`.
   - Se `None` ou não-string → retorna `False`.
   - Normaliza com `.strip().upper()`.
@@ -86,14 +86,14 @@
 
 ### 3B — Extração Segura de Campos (RN05)
 
-- [ ] **3.2** Implementar `safe_str(record, key) → str` em `transformer.py`:
+- [x] **3.2** Implementar `safe_str(record, key) → str` em `transformer.py`:
   - `record.get(key)` — se `None` ou ausente, retorna `""`.
   - Caso contrário, retorna `str(value)`.
   - Trata o caso especial: valores numéricos (ex: `age=26`) devem virar `"26"`, não falhar.
 
 ### 3C — Formatação de Datas (RN04)
 
-- [ ] **3.3** Implementar `format_date(value) → str` em `transformer.py`:
+- [x] **3.3** Implementar `format_date(value) → str` em `transformer.py`:
   - Se `value` é `None`, não é string, ou é string vazia → retorna `""`.
   - Tenta parsear com `datetime.strptime()` nos formatos: `'%Y-%m-%d'`, `'%d/%m/%Y'`, `'%Y/%m/%d'`.
   - Se algum suceder → retorna `date.strftime('%Y-%m-%d')`.
@@ -101,7 +101,7 @@
 
 ### 3D — Formatação de Cores (RN03)
 
-- [ ] **3.4** Implementar `format_colors(colors) → str` em `transformer.py`:
+- [x] **3.4** Implementar `format_colors(colors) → str` em `transformer.py`:
   - Se `colors` é `None` ou não é `list` → retorna `""`.
   - Filtra elementos `None` da lista.
   - Une com `'|'.join(...)`.
@@ -109,12 +109,12 @@
 
 ### 3E — Funções de Transformação (Mapeamento JSON → CSV Row)
 
-- [ ] **3.5** Implementar `transform_club(record) → list` em `transformer.py`:
+- [x] **3.5** Implementar `transform_club(record) → list` em `transformer.py`:
   - Extrai os 11 campos do clube na ordem exata do CSV, usando `safe_str`, `format_date`, `format_colors`.
   - Campos extraídos: `club_id`, `name`, `championship`, `founding_date`, `city`, `state`, `country`, `stadium`, `president`, `nickname`, `colors`.
   - Campos descartados (não mapeados): `titles`, `players`.
   
-- [ ] **3.6** Implementar `transform_player(club_id, player) → list` em `transformer.py`:
+- [x] **3.6** Implementar `transform_player(club_id, player) → list` em `transformer.py`:
   - Extrai os 8 campos do jogador na ordem exata do CSV, usando `safe_str`, `format_date`.
   - Primeiro campo é o `club_id` do clube pai (passado como argumento).
   - Campos descartados: `nationality`, `market_value`.
@@ -129,13 +129,13 @@
 
 ### 4A — Orquestrador Principal
 
-- [ ] **4.1** Implementar `main.py` com a função `process(input_path, output_dir)`:
+- [x] **4.1** Implementar `main.py` com a função `process(input_path, output_dir)`:
   - Compõe o pipeline: `read_jsonl()` → filtragem → transformação → escrita.
   - Abre os 3 arquivos (1 input + 2 output) com gerenciamento de contexto (`with`).
   - Itera sobre os registros válidos e filtrados.
   - Para cada registro, escreve em `clubs.csv` e itera sobre `players` para escrever em `players.csv`.
 
-- [ ] **4.2** Implementar tratamento de argumentos CLI:
+- [x] **4.2** Implementar tratamento de argumentos CLI:
   - `sys.argv[1]` — caminho do arquivo de entrada (obrigatório).
   - `sys.argv[2]` — diretório de saída (opcional; padrão = diretório do arquivo de entrada).
   - Validar que o arquivo de entrada existe (`os.path.isfile()`).
@@ -143,12 +143,12 @@
 
 ### 4B — Tolerância a Falhas
 
-- [ ] **4.3** Envolver o processamento de cada registro em `try/except Exception`:
+- [x] **4.3** Envolver o processamento de cada registro em `try/except Exception`:
   - Erros inesperados em um registro individual são logados como WARNING.
   - O pipeline segue para o próximo registro.
   - Apenas erros de infraestrutura (arquivo não encontrado, I/O) abortam.
 
-- [ ] **4.4** Implementar contadores de processamento:
+- [x] **4.4** Implementar contadores de processamento:
   - `linhas_lidas` — total de linhas no arquivo.
   - `linhas_vazias` — linhas em branco ignoradas.
   - `linhas_json_invalido` — JSONs malformados.
@@ -158,11 +158,11 @@
 
 ### 4C — Logging e Relatório Final
 
-- [ ] **4.5** Configurar `logging` com formato padronizado:
+- [x] **4.5** Configurar `logging` com formato padronizado:
   - Formato: `%(asctime)s [%(levelname)s] %(message)s`
   - Nível padrão: `INFO`.
 
-- [ ] **4.6** Implementar relatório final no console ao término:
+- [x] **4.6** Implementar relatório final no console ao término:
   ```
   ✅ Processamento concluído com sucesso.
      Linhas lidas:              1.000.000
