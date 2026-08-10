@@ -241,9 +241,33 @@
 | 3    | Regras de Negócio e Parsers        | `transformer.py` completo                     | Fase 2      |
 | 4    | Orquestração e Tolerância a Falhas | `main.py` integrado, logging, contadores      | Fases 2 + 3 |
 | 5    | Testes, Validação e Documentação   | Testes, CSVs validados, README, entrega final | Fase 4      |
+| 6    | Elevação para Nível Sênior (SRE)   | Type hints, Logs JSON, utf-8-sig, CI/CD, Docker | Fase 5      |
 
 ```
 Fase 1 ──▶ Fase 2 ──▶ Fase 3 ──┐
-                                 ├──▶ Fase 4 ──▶ Fase 5
+                                 ├──▶ Fase 4 ──▶ Fase 5 ──▶ Fase 6
                    (Fase 2) ────┘
 ```
+
+---
+
+## Fase 6: Elevação para Nível Sênior (Cloud & SRE)
+
+**Objetivo:** Refatorar o código resolvendo 5 gargalos (Pontos Cegos) apontados em Code Review simulado, tornando o projeto "Cloud-Ready".
+
+### 6A — Blindagem de Tipagem
+- [ ] **6.1** Adicionar type hints explícitos (módulo `typing`) nas assinaturas de `reader.py`.
+- [ ] **6.2** Adicionar type hints explícitos (módulo `typing`) nas assinaturas de `transformer.py`.
+- [ ] **6.3** Adicionar type hints e `Dict`/`Any` (se necessário) no `main.py`.
+
+### 6B — Observabilidade Cloud (Logs JSON)
+- [ ] **6.4** Substituir logs em texto puro por formatação JSON em `src/main.py`.
+- [ ] **6.5** Implementar `logging.Formatter` customizado nativo para serializar mensagens em JSON.
+
+### 6C — Resiliência a Encodings Window
+- [ ] **6.6** Atualizar `open()` no `reader.py` para usar `encoding='utf-8-sig'` (tratamento de BOM).
+- [ ] **6.7** Atualizar `open()` no `reader.py` para usar `errors='replace'` para prevenir corrupção isolada de bytes.
+
+### 6D — Automação e Empacotamento
+- [ ] **6.8** CI/CD: Criar pipeline GitHub Actions (`.github/workflows/main.yml`) com linting (flake8/mypy) e testes (pytest).
+- [ ] **6.9** Docker: Criar `Dockerfile` enxuto com multi-stage build ou imagem distroless-like baseada em alpine.
