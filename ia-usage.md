@@ -77,4 +77,11 @@ Todas as missões foram concluídas seguindo estritamente as boas práticas de E
 - **Data e Hora:** 2026-08-10 21:58 (BRT)
 - **Prompt do usuário:** Missão 9 — Idempotência e Visão de Produto (Atomic Writes). Solicitou: (1) Estratégia de Write-to-Temp-and-Rename para arquivos CSV e DLQ em `main.py` garantindo que re-execuções em caso de aborto não dupliquem dados (Idempotência); (2) Deletar arquivos `.tmp` em caso de erro fatal no bloco `finally`; (3) Adicionar seção "Próxima Fronteira (Roadmap de Escala Corporativa)" no `architecture.md` cobrindo Sharding, Resumabilidade e Prevenção de Estouro de linha única; (4) Atualizar `README.md`.
 - **Resposta/Ação da IA:** Registro no `ia-usage.md`. Modificação do `main.py` aplicando operação atômica de SO (`os.replace`) após loop com sucesso e deleção de `.tmp` no `finally` se abortado. Inserção de visão corporativa (sharding, checkpointing, stream parser) em `architecture.md`. Atualização do `README.md`.
+
+---
+
+### Interação #12 (QA/SDET - Cobertura Absoluta)
+- **Data e Hora:** 2026-08-10 22:03 (BRT)
+- **Prompt do usuário:** Missão 10 — Cobertura Absoluta e Engenharia de Qualidade (QA/SDET). Solicitou atualização/criação de 4 módulos de teste: (1) `test_transformer.py` (case-insensitivity, lru_cache com conversão p/ tupla, nulos); (2) `test_resilience.py` (BOM `\ufeff`, DLQ com Exit Code 0 equivalent behavior); (3) `test_idempotency.py` (Novo - Monkeypatch forçando erro e verificando deleção de `.tmp` no finally); (4) `test_performance.py` (Novo - Teste com mock do generator processando 250k linhas garantindo `gc.collect.call_count == 2`). Todos com a fixture `tmp_path`.
+- **Resposta/Ação da IA:** Registro no `ia-usage.md`. Implementação e refatoração completa da suite de testes solicitada.
 ---
