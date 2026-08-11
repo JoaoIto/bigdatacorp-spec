@@ -242,10 +242,11 @@
 | 4    | Orquestração e Tolerância a Falhas | `main.py` integrado, logging, contadores      | Fases 2 + 3 |
 | 5    | Testes, Validação e Documentação   | Testes, CSVs validados, README, entrega final | Fase 4      |
 | 6    | Elevação para Nível Sênior (SRE)   | Type hints, Logs JSON, utf-8-sig, CI/CD, Docker | Fase 5      |
+| 7    | Hyper-Otimização e Auditoria (DLQ) | Buffer Tuning, GC Disable, Dead Letter Queue  | Fase 6      |
 
 ```
 Fase 1 ──▶ Fase 2 ──▶ Fase 3 ──┐
-                                 ├──▶ Fase 4 ──▶ Fase 5 ──▶ Fase 6
+                                 ├──▶ Fase 4 ──▶ Fase 5 ──▶ Fase 6 ──▶ Fase 7
                    (Fase 2) ────┘
 ```
 
@@ -271,3 +272,28 @@ Fase 1 ──▶ Fase 2 ──▶ Fase 3 ──┐
 ### 6D — Automação e Empacotamento
 - [x] **6.8** CI/CD: Criar pipeline GitHub Actions (`.github/workflows/main.yml`) com linting (flake8/mypy) e testes (pytest).
 - [x] **6.9** Docker: Criar `Dockerfile` enxuto com multi-stage build ou imagem distroless-like baseada em alpine.
+
+---
+
+## Fase 7: Hyper-Otimização e Auditoria (DLQ)
+
+**Objetivo:** Eliminar gargalos ocultos de I/O e CPU em escala de Terabytes e implementar retenção auditável de dados corrompidos (Dead Letter Queue).
+
+### 7A — Buffer Tuning (Redução de sys_write)
+- [x] **7.1** Aplicar `buffering=262144` (256 KB) no `open()` de leitura em `reader.py`.
+- [x] **7.2** Aplicar `buffering=262144` (256 KB) no `open()` de escrita em `writer.py`.
+
+### 7B — Tuning do Garbage Collector
+- [x] **7.3** Importar `gc` no `main.py`.
+- [x] **7.4** Desativar o GC (`gc.disable()`) antes do loop principal de processamento.
+- [x] **7.5** Reativar o GC (`gc.enable()`) no bloco `finally`, garantindo reativação mesmo em caso de erro.
+
+### 7C — Dead Letter Queue (DLQ)
+- [x] **7.6** Modificar `read_jsonl()` para aceitar um file handle de DLQ opcional via parâmetro.
+- [x] **7.7** Gravar linhas brutas (raw strings) com `JSONDecodeError` ou tipo inválido no arquivo `dlq_errors.txt`.
+- [x] **7.8** Gerenciar o ciclo de vida (open/close) do arquivo DLQ no `main.py`.
+- [x] **7.9** Adicionar contador `linhas_dlq` nos stats do pipeline.
+
+### 7D — Documentação e Validação
+- [x] **7.10** Atualizar `README.md` com seção sobre Buffer Tuning, GC Disable e DLQ.
+- [x] **7.11** Garantir que todos os testes (pytest) e tipagem (mypy) continuam passando.

@@ -251,3 +251,63 @@ def is_valid_championship(record):
 - ✅ Tolera variações comuns de capitalização e espaçamento.
 - ✅ Simples e sem dependências externas (sem `unicodedata.normalize()`).
 - ⚠️ Se a base real usar variações com acento, o set pode ser expandido facilmente.
+
+---
+
+## ADR-008: Otimização de I/O (Buffer Tuning) e Garbage Collector
+
+### Status
+**Aceito** (Fase 7 - Hyper-Otimização)
+
+### Contexto
+Em escala de Terabytes, dois gargalos ocultos degradam severamente o throughput do pipeline:
+
+**Gargalo 1 — I/O Físico (sys_write excessivos):**
+O CPython abre arquivos de texto com um buffer padrão de ~8 KB (`io.DEFAULT_BUFFER_SIZE`). Para cada ~8 KB gravados, o runtime faz uma chamada de sistema `write()` ao kernel. Em um pipeline que processa milhões de registros, isso gera milhões de syscalls desnecessárias. Em discos de rede (NFS, EFS, CIFS), cada syscall paga latência de rede, tornando o problema exponencialmente pior.
+
+**Gargalo 2 — Pressão no Garbage Collector (GC):**
+O loop principal cria e descarta milhões de dicts temporários (um por registro JSONL). O GC geracional do CPython monitora objetos na geração 0 e dispara coletas automáticas a cada ~700 alocações. Para 1 milhão de registros, isso equivale a ~1.400 coletas automáticas — cada uma causando uma micro-pausa (stop-the-world) que degrada o throughput de CPU.
+
+### Decisão
+**Buffer Tuning:** Aumentar o buffer de I/O para 256 KB (`buffering=262144`) em todas as chamadas `open()` do Reader e do Writer. Isso reduz as syscalls em ~32x (de 8 KB para 256 KB por chamada).
+
+**GC Disable:** Desativar o Garbage Collector (`gc.disable()`) durante o loop principal de processamento e reativá-lo no bloco `finally`. Isso é seguro porque:
+- O pipeline é single-threaded (sem referências cíclicas de outras threads).
+- Os dicts temporários são efêmeros e serão coletados pelo reference counting normal do CPython (sem necessidade do GC geracional).
+- O `finally` garante que o GC será reativado mesmo em caso de exceção.
+
+### Consequências
+- ✅ Redução de ~32x nas syscalls de I/O — impacto medível em discos de rede (EFS/NFS).
+- ✅ Eliminação de ~1.400 coletas de GC por milhão de registros — throughput de CPU mais estável.
+- ✅ Zero risco: o reference counting do CPython continua ativo; o `finally` garante reativação.
+- ⚠️ O buffer de 256 KB aumenta o consumo de RAM em ~768 KB (3 arquivos × 256 KB) — desprezível.
+
+---
+
+## ADR-009: Padrão Dead Letter Queue (DLQ) para Auditoria de Dados
+
+### Status
+**Aceito** (Fase 7 - Auditoria)
+
+### Contexto
+Atualmente, quando o Reader encontra uma linha com JSON malformado ou tipo inesperado, ele loga um WARNING e descarta a linha. Em ambientes corporativos e financeiros, **"sumir" com o dado é inadmissível**. A equipe de Data Quality precisa inspecionar as linhas originais para:
+- Diagnosticar problemas no sistema upstream (quem gerou o JSONL corrompido?).
+- Quantificar a taxa de corrupção por arquivo.
+- Reprocessar as linhas após correção.
+
+### Decisão
+**Implementar um arquivo de Dead Letter Queue (`dlq_errors.txt`) na pasta de output.**
+
+O Reader receberá um file handle opcional de DLQ. Para cada linha rejeitada (JSONDecodeError ou tipo não-dict), a **string original bruta** (raw line) será gravada no arquivo DLQ, precedida por um prefixo com o número da linha e o motivo do descarte. O formato será:
+
+```
+[LINHA:4][JSON_MALFORMADO] isto nao e json
+[LINHA:7][TIPO_INVALIDO:list] ["lista em vez de dict"]
+```
+
+### Consequências
+- ✅ **Auditoria Completa:** Nenhum dado é perdido silenciosamente — toda linha rejeitada é preservada.
+- ✅ **Rastreabilidade:** O prefixo `[LINHA:N]` permite localização imediata no arquivo original.
+- ✅ **Reprocessamento:** A equipe de Data Quality pode extrair as linhas brutas e corrigir upstream.
+- ✅ **Zero Impacto no Pipeline:** O pipeline continua processando normalmente; o DLQ é escrita paralela.
+- ⚠️ Em datasets com alta taxa de corrupção, o arquivo DLQ pode crescer significativamente.
