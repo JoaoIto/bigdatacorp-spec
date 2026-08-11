@@ -328,3 +328,23 @@ Para este caso, a complexidade adicional **não se justifica**:
 2. **Overhead de IPC:** Multiprocessing exige serializar/deserializar dados entre processos.
 3. **Complexidade de código:** O enunciado valoriza **clareza e organização**. Async/multiprocessing adicionam complexidade sem benefício mensurável.
 4. **Performance suficiente:** Python puro com streaming processa ~500K–1M linhas/segundo. Para milhões de registros, isso significa minutos — totalmente aceitável para batch.
+
+---
+
+## 7. Próxima Fronteira (Roadmap de Escala Corporativa)
+
+O sistema atual atende perfeitamente ao requisito $O(1)$ de memória para processamento local de arquivos JSONL gigantes. No entanto, para escalar para um ecossistema cloud real (Petabytes) e topologias de sistemas distribuídos (SRE/DevOps), o design precisaria evoluir em três eixos principais:
+
+### 7.1 Escala Horizontal via Sharding
+A leitura sequencial impõe um teto de vazão limitado à capacidade de um único disco/CPU.
+- **Evolução:** Em vez de rodar o script contra um arquivo inteiro, o orquestrador (ex: Airflow) quebraria o arquivo gigante em N shards ou leria diretamente de um barramento de eventos (ex: Amazon SQS, Kafka).
+- **Execução:** O container do nosso pipeline se tornaria completamente **stateless**. Centenas de réplicas processariam os shards em paralelo (ex: AWS Fargate, Kubernetes) e fariam o dump dos resultados diretamente num Data Lake (AWS S3) com tabelas versionadas no Athena/Iceberg, em vez de arquivos CSV locais.
+
+### 7.2 Resumabilidade (Checkpointing)
+Atualmente, se o processamento abortar na linha 9.999.999, graças à idempotência (escritas em `.tmp`), evitamos corromper a base final. Porém, precisamos reiniciar do zero.
+- **Evolução:** Implementar um mecanismo de gravação do `byte-offset` do arquivo de entrada a cada $X$ registros. 
+- **Recuperação:** Num reinício, o `reader.py` usaria `file.seek(offset)` para pular instantaneamente todo o arquivo já processado, retomando a execução do exato ponto de falha.
+
+### 7.3 Prevenção de Estouro de Linha Única (Streaming JSON Parser)
+Nossa promessa $O(1)$ assegura que a memória só cresce até o tamanho da maior linha $O(M)$. Mas e se um clube mal-intencionado vier com 5 milhões de jogadores numa única string JSONL, totalizando 15GB numa só linha? O buffer da RAM iria estourar.
+- **Evolução:** Substituir `json.loads` (que exige a string inteira em RAM) por um parser SAX-like para JSON em C, como o **`ijson`** (ou `yajl`). Ele permite ler arrays JSON emitindo eventos (prefixo/item) de forma verdadeiramente iterativa, nunca carregando a linha inteira em memória.

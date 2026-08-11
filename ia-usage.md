@@ -70,4 +70,11 @@ Todas as missões foram concluídas seguindo estritamente as boas práticas de E
 - **Data e Hora:** 2026-08-10 21:41 (BRT)
 - **Prompt do usuário:** Missão 8 — Micro-Otimizações CPython e GC Determinístico. Solicitou: (1) Local Variable Aliasing nos hot loops do `main.py` e `reader.py` para forçar `LOAD_FAST` no bytecode em vez de `LOAD_ATTR`; (2) Decorador `@lru_cache(maxsize=256)` na função `format_colors` do `transformer.py` com conversão de lista para tupla para hashabilidade; (3) GC Determinístico — substituir o `gc.disable()` permanente por coleta forçada da Geração 0 a cada 100.000 linhas via `gc.collect(generation=0)` com operador módulo `%`; (4) Atualização do `README.md`.
 - **Resposta/Ação da IA:** Registro no `ia-usage.md`. Refatoração do `reader.py` com aliasing de `json.loads`. Refatoração do `main.py` com aliasing de `writerow`, `is_valid_championship`, `transform_club`, `transform_player`, `safe_str` e GC determinístico com coleta Gen 0 a cada 100K linhas. Refatoração do `transformer.py` com `@lru_cache` em wrapper interno de `format_colors`. Atualização do `README.md`. Validação com pytest.
+
+---
+
+### Interação #11 (Idempotência e Visão de Produto)
+- **Data e Hora:** 2026-08-10 21:58 (BRT)
+- **Prompt do usuário:** Missão 9 — Idempotência e Visão de Produto (Atomic Writes). Solicitou: (1) Estratégia de Write-to-Temp-and-Rename para arquivos CSV e DLQ em `main.py` garantindo que re-execuções em caso de aborto não dupliquem dados (Idempotência); (2) Deletar arquivos `.tmp` em caso de erro fatal no bloco `finally`; (3) Adicionar seção "Próxima Fronteira (Roadmap de Escala Corporativa)" no `architecture.md` cobrindo Sharding, Resumabilidade e Prevenção de Estouro de linha única; (4) Atualizar `README.md`.
+- **Resposta/Ação da IA:** Registro no `ia-usage.md`. Modificação do `main.py` aplicando operação atômica de SO (`os.replace`) após loop com sucesso e deleção de `.tmp` no `finally` se abortado. Inserção de visão corporativa (sharding, checkpointing, stream parser) em `architecture.md`. Atualização do `README.md`.
 ---
